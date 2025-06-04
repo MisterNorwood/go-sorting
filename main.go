@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"runtime"
 	"sort"
 	"strconv"
 	"sync"
