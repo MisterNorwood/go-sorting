@@ -32,3 +32,10 @@ func TestQuickSort(t *testing.T) {
 	sorted := []int{2, 2, 3, 4, 5, 5, 6, 7, 8, 9}
 	assert.Equal(t, sorted, toSort)
 }
+
+func TestRadixSortSigned(t *testing.T) {
+	toSort := ([]int{5, 7, 5, 9, 2, 4, 2, 3, 8, 6})
+	RadixSortSigned(toSort)
+	sorted := []int{2, 2, 3, 4, 5, 5, 6, 7, 8, 9}
+	assert.Equal(t, sorted, toSort)
+}

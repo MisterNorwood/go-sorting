@@ -181,13 +181,76 @@ func BenchmarkSortThreaded(sortFunc func([]int, int, int) []int, arr []int, iter
 	return totalTime / time.Duration(iterations)
 }
 
+func RadixSortSigned(nums []int) {
+	if len(nums) == 0 {
+		return
+	}
+
+	var negs, poss []int
+	for _, n := range nums {
+		if n < 0 {
+			negs = append(negs, -n)
+		} else {
+			poss = append(poss, n)
+		}
+	}
+
+	radixSortBase10(negs)
+	radixSortBase10(poss)
+
+	for i := 0; i < len(negs)/2; i++ {
+		negs[i], negs[len(negs)-1-i] = negs[len(negs)-1-i], negs[i]
+	}
+	for i := range negs {
+		negs[i] = -negs[i]
+	}
+
+	// Combine
+	copy(nums, append(negs, poss...))
+}
+
+func radixSortBase10(nums []int) {
+	if len(nums) == 0 {
+		return
+	}
+
+	max := nums[0]
+	for _, n := range nums {
+		if n > max {
+			max = n
+		}
+	}
+
+	exp := 1
+	for max/exp > 0 {
+		count := make([]int, 10)
+		output := make([]int, len(nums))
+
+		for _, n := range nums {
+			d := (n / exp) % 10
+			count[d]++
+		}
+		for i := 1; i < 10; i++ {
+			count[i] += count[i-1]
+		}
+		for i := len(nums) - 1; i >= 0; i-- {
+			d := (nums[i] / exp) % 10
+			count[d]--
+			output[count[d]] = nums[i]
+		}
+		copy(nums, output)
+		exp *= 10
+	}
+}
+
 func main() {
-	sizes := []int{100, 1000, 10_000, 100_000}
+	sizes := []int{100, 1000, 10_000, 100_000, 1_000_000}
 	iterationsBySize := map[int]int{
-		100:     1000,
-		1000:    500,
-		10_000:  100,
-		100_000: 100,
+		100:       1000,
+		1000:      500,
+		10_000:    100,
+		100_000:   10,
+		1_000_000: 5,
 	}
 
 	for _, size := range sizes {
@@ -201,8 +264,9 @@ func main() {
 
 		fmt.Println("QuickSort:", BenchmarkSort(QuickSort, arr, iterations))
 		fmt.Println("Go's built-in Sort:", BenchmarkSortNoReturn(sort.Ints, arr, iterations))
+		fmt.Println("Radix Sort", BenchmarkSortNoReturn(RadixSortSigned, arr, iterations))
 		fmt.Println("Threaded merge sort:", BenchmarkSortThreaded(ParallelMergeSort, arr, iterations))
-		fmt.Println("Bubble Sort:", BenchmarkSort(BubbleSort, arr, iterations))
 		fmt.Println("Insertion Sort:", BenchmarkSort(InsertionSort, arr, iterations))
+		fmt.Println("Bubble Sort:", BenchmarkSort(BubbleSort, arr, iterations))
 	}
 }
