@@ -10,7 +10,7 @@ import (
 )
 
 // BubbleSort implementation
-func BubbleSort(arr []int) {
+func BubbleSort(arr []int) []int {
 	n := len(arr)
 	for i := 0; i < n-1; i++ {
 		for j := 0; j < n-i-1; j++ {
@@ -19,10 +19,11 @@ func BubbleSort(arr []int) {
 			}
 		}
 	}
+	return arr
 }
 
 // InsertionSort implementation
-func InsertionSort(arr []int) {
+func InsertionSort(arr []int) []int {
 	n := len(arr)
 	for i := 1; i < n; i++ {
 		key := arr[i]
@@ -33,24 +34,31 @@ func InsertionSort(arr []int) {
 		}
 		arr[j+1] = key
 	}
+	return arr
 }
 
 // QuickSort implementation
-func QuickSort(arr []int) {
+func QuickSort(arr []int) []int {
 	if len(arr) < 2 {
-		return
+		return arr
 	}
 	pivot := arr[len(arr)/2]
-	left, right := 0, len(arr)-1
-	for i := range arr {
-		if arr[i] < pivot {
-			arr[i], arr[left] = arr[left], arr[i]
-			left++
+	var less, equal, greater []int
+
+	for _, v := range arr {
+		switch {
+		case v < pivot:
+			less = append(less, v)
+		case v == pivot:
+			equal = append(equal, v)
+		case v > pivot:
+			greater = append(greater, v)
 		}
 	}
-	arr[left], arr[right] = arr[right], arr[left]
-	QuickSort(arr[:left])
-	QuickSort(arr[left+1:])
+
+	sortedLess := QuickSort(less)
+	sortedGreater := QuickSort(greater)
+	return append(append(sortedLess, equal...), sortedGreater...)
 }
 
 // merge function to combine two sorted slices into one sorted slice
@@ -74,7 +82,7 @@ func merge(left, right []int) []int {
 }
 
 // parallelMergeSort sorts the array using parallel merge sort with dynamic thread control
-func parallelMergeSort(arr []int, depth, maxDepth int) []int {
+func ParallelMergeSort(arr []int, depth, maxDepth int) []int {
 	if len(arr) <= 1 {
 		return arr
 	}
@@ -100,19 +108,19 @@ func parallelMergeSort(arr []int, depth, maxDepth int) []int {
 	// Parallel sorting using dynamic threads based on available CPUs
 	go func() {
 		defer wg.Done()
-		sorted1 = parallelMergeSort(part1, depth+1, maxDepth)
+		sorted1 = ParallelMergeSort(part1, depth+1, maxDepth)
 	}()
 	go func() {
 		defer wg.Done()
-		sorted2 = parallelMergeSort(part2, depth+1, maxDepth)
+		sorted2 = ParallelMergeSort(part2, depth+1, maxDepth)
 	}()
 	go func() {
 		defer wg.Done()
-		sorted3 = parallelMergeSort(part3, depth+1, maxDepth)
+		sorted3 = ParallelMergeSort(part3, depth+1, maxDepth)
 	}()
 	go func() {
 		defer wg.Done()
-		sorted4 = parallelMergeSort(part4, depth+1, maxDepth)
+		sorted4 = ParallelMergeSort(part4, depth+1, maxDepth)
 	}()
 
 	// Wait for all goroutines to finish
@@ -134,7 +142,19 @@ func mergeSort(arr []int) []int {
 }
 
 // Benchmark sorting algorithms with averaging
-func BenchmarkSort(sortFunc func([]int), arr []int, iterations int) time.Duration {
+func BenchmarkSort(sortFunc func([]int) []int, arr []int, iterations int) time.Duration {
+	totalTime := time.Duration(0)
+	for i := 0; i < iterations; i++ {
+		copyArr := make([]int, len(arr))
+		copy(copyArr, arr)
+		start := time.Now()
+		sortFunc(copyArr)
+		totalTime += time.Since(start)
+	}
+	return totalTime / time.Duration(iterations)
+}
+
+func BenchmarkSortNoReturn(sortFunc func([]int), arr []int, iterations int) time.Duration {
 	totalTime := time.Duration(0)
 	for i := 0; i < iterations; i++ {
 		copyArr := make([]int, len(arr))
@@ -180,8 +200,8 @@ func main() {
 		}
 
 		fmt.Println("QuickSort:", BenchmarkSort(QuickSort, arr, iterations))
-		fmt.Println("Go's built-in Sort:", BenchmarkSort(sort.Ints, arr, iterations))
-		fmt.Println("Go's built-in Sort:", BenchmarkSortThreaded(parallelMergeSort, arr, iterations))
+		fmt.Println("Go's built-in Sort:", BenchmarkSortNoReturn(sort.Ints, arr, iterations))
+		fmt.Println("Threaded merge sort:", BenchmarkSortThreaded(ParallelMergeSort, arr, iterations))
 		fmt.Println("Bubble Sort:", BenchmarkSort(BubbleSort, arr, iterations))
 		fmt.Println("Insertion Sort:", BenchmarkSort(InsertionSort, arr, iterations))
 	}
