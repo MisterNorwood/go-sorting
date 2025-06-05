@@ -11,6 +11,65 @@ import (
 	"time"
 )
 
+func BucketSort(arr []int) []int {
+	if len(arr) == 0 {
+		return arr
+	}
+
+	maxVal := arr[0]
+	for _, v := range arr {
+		if v > maxVal {
+			maxVal = v
+		}
+	}
+
+	bucketCount := len(arr)/10 + 1
+	buckets := make([][]int, bucketCount)
+
+	for _, v := range arr {
+		index := v * (bucketCount - 1) / (maxVal + 1)
+		buckets[index] = append(buckets[index], v)
+	}
+
+	var sorted []int
+	for _, b := range buckets {
+		sort.Ints(b) // local sort
+		sorted = append(sorted, b...)
+	}
+	return sorted
+}
+
+func heapify(a []int, n, i int) {
+	largest := i
+	left := 2*i + 1
+	right := 2*i + 2
+
+	if left < n && a[left] > a[largest] {
+		largest = left
+	}
+	if right < n && a[right] > a[largest] {
+		largest = right
+	}
+	if largest != i {
+		a[i], a[largest] = a[largest], a[i]
+		heapify(a, n, largest)
+	}
+}
+
+func HeapSort(arr []int) []int {
+	a := append([]int(nil), arr...)
+
+	n := len(a)
+	for i := n/2 - 1; i >= 0; i-- {
+		heapify(a, n, i)
+	}
+	for i := n - 1; i >= 0; i-- {
+		a[0], a[i] = a[i], a[0]
+		heapify(a, i, 0)
+	}
+	return a
+}
+
 func BubbleSort(arr []int) []int {
 	n := len(arr)
 	for i := 0; i < n-1; i++ {
@@ -120,7 +179,7 @@ func ParallelMergeSort(arr []int) []int {
 	return sort(arr, 0)
 }
 
-func BenchmarkSort(sortFn func([]int) []int, base []int, iterations int) int64 {
+func BenchmarkSort(sortFn func([]int) []int, base []int, iterations int) float64 {
 	var total int64
 	for i := 0; i < iterations; i++ {
 		a := make([]int, len(base))
@@ -130,10 +189,10 @@ func BenchmarkSort(sortFn func([]int) []int, base []int, iterations int) int64 {
 		sortFn(a)
 		total += time.Since(start).Microseconds()
 	}
-	return total / int64(iterations)
+	return float64(total) / float64(iterations)
 }
 
-func BenchmarkSortNoReturn(sortFn func([]int), base []int, iterations int) int64 {
+func BenchmarkSortNoReturn(sortFn func([]int), base []int, iterations int) float64 {
 	var total int64
 	for i := 0; i < iterations; i++ {
 		a := make([]int, len(base))
@@ -143,7 +202,7 @@ func BenchmarkSortNoReturn(sortFn func([]int), base []int, iterations int) int64
 		sortFn(a)
 		total += time.Since(start).Microseconds()
 	}
-	return total / int64(iterations)
+	return float64(total) / float64(iterations)
 }
 
 func RadixSortSigned(nums []int) {
@@ -210,11 +269,12 @@ func radixSortBase10(nums []int) {
 func main() {
 	sizes := []int{100, 1000, 10_000, 100_000, 1_000_000}
 	iterationsBySize := map[int]int{
-		100:       1000,
-		1000:      500,
-		10_000:    100,
-		100_000:   10,
-		1_000_000: 5,
+		100:        1000,
+		1000:       500,
+		10_000:     100,
+		100_000:    10,
+		1_000_000:  5,
+		10_000_000: 1,
 	}
 
 	file, err := os.Create("results.csv")
@@ -252,7 +312,20 @@ func main() {
 		benchNR("Go's built-in Sort", sort.Ints)
 		benchNR("Radix Sort", RadixSortSigned)
 		bench("Threaded merge sort", ParallelMergeSort)
-		bench("Insertion Sort", InsertionSort)
-		bench("Bubble Sort", BubbleSort)
+		bench("Heap Sort", HeapSort)
+		bench("Bucket Sort", BucketSort)
+		if size < 1_000_000 {
+			bench("Insertion Sort", InsertionSort)
+		} else {
+			fmt.Println("Insertion Sort: skipped (too slow)")
+			writer.Write([]string{strconv.Itoa(size), "Insertion Sort", "skipped"})
+		}
+
+		if size < 1_000_000 {
+			bench("Bubble Sort", BubbleSort)
+		} else {
+			fmt.Println("Bubble Sort: skipped (too slow)")
+			writer.Write([]string{strconv.Itoa(size), "Bubble Sort", "skipped"})
+		}
 	}
 }
