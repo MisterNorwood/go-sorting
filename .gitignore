@@ -1,0 +1,31 @@
+# LaTeX intermediate and auxiliary files
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.synctex.gz
+*.vrb
+*.xdv
+
+# Latexmk and other tools
+*.pdfsync
+*.synctex(busy)
+
+# Backup and temp files
+*~
+*.bak
+*.backup
+*.tmp
+*.swp
+*.swo
+
+.~lock*
