@@ -267,14 +267,14 @@ func radixSortBase10(nums []int) {
 }
 
 func main() {
-	sizes := []int{100, 1000, 10_000, 100_000, 1_000_000}
+	sizes := []int{100, 1000, 10_000, 100_000, 1_000_000, 10_000_000}
 	iterationsBySize := map[int]int{
 		100:        1000,
 		1000:       500,
 		10_000:     100,
 		100_000:    10,
 		1_000_000:  5,
-		10_000_000: 1,
+		10_000_000: 5,
 	}
 
 	file, err := os.Create("results.csv")

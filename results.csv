@@ -1,0 +1,49 @@
+Size,Algorithm,Time (ms)
+100,QuickSort,8.87
+100,Go's built-in Sort,0.01
+100,Radix Sort,1.09
+100,Threaded merge sort,4.48
+100,Heap Sort,1.11
+100,Bucket Sort,1.80
+100,Insertion Sort,1.03
+100,Bubble Sort,3.02
+1000,QuickSort,165.14
+1000,Go's built-in Sort,7.90
+1000,Radix Sort,18.98
+1000,Threaded merge sort,40.26
+1000,Heap Sort,21.67
+1000,Bucket Sort,13.68
+1000,Insertion Sort,106.79
+1000,Bubble Sort,487.13
+10000,QuickSort,1584.91
+10000,Go's built-in Sort,353.36
+10000,Radix Sort,182.70
+10000,Threaded merge sort,307.70
+10000,Heap Sort,550.60
+10000,Bucket Sort,278.61
+10000,Insertion Sort,9263.46
+10000,Bubble Sort,28210.00
+100000,QuickSort,21757.80
+100000,Go's built-in Sort,4327.90
+100000,Radix Sort,3221.30
+100000,Threaded merge sort,4045.10
+100000,Heap Sort,7614.90
+100000,Bucket Sort,4044.60
+100000,Insertion Sort,863296.80
+100000,Bubble Sort,6180190.00
+1000000,QuickSort,203230.60
+1000000,Go's built-in Sort,47876.00
+1000000,Radix Sort,26929.60
+1000000,Threaded merge sort,18241.80
+1000000,Heap Sort,96219.20
+1000000,Bucket Sort,32787.80
+1000000,Insertion Sort,skipped
+1000000,Bubble Sort,skipped
+10000000,QuickSort,2047687.60
+10000000,Go's built-in Sort,550829.40
+10000000,Radix Sort,297298.00
+10000000,Threaded merge sort,157711.00
+10000000,Heap Sort,1650828.20
+10000000,Bucket Sort,551177.80
+10000000,Insertion Sort,skipped
+10000000,Bubble Sort,skipped
